@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cede Arena - Visual Gallery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #0a0e27;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #00f0ff;
+            padding-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 48px;
+            color: #ff00ff;
+            text-shadow: 0 0 20px #ff00ff, 0 0 40px #00f0ff;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .header p {
+            color: #00f0ff;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+        
+        .disclaimer {
+            background: rgba(255, 0, 255, 0.05);
+            border: 1px solid #ff00ff;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            border-bottom: 2px solid rgba(0, 240, 255, 0.3);
+        }
+        
+        .tab-btn {
+            padding: 12px 24px;
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid #00f0ff;
+            color: #00f0ff;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+        }
+        
+        .tab-btn.active {
+            background: #00f0ff;
+            color: #0a0e27;
+            box-shadow: 0 0 20px #00f0ff;
+        }
+        
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 16/9;
+            cursor: pointer;
+            border: 2px solid rgba(0, 240, 255, 0.3);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: #1a1f3a;
+        }
+        
+        .gallery-item:hover {
+            border-color: #ff00ff;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+            transform: scale(1.02);
+        }
+        
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .like-btn {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            width: 36px;
+            height: 36px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+            z-index: 10;
+        }
+        
+        .like-btn:hover {
+            background: #ff00ff;
+            color: #0a0e27;
+            box-shadow: 0 0 10px #ff00ff;
+        }
+        
+        .like-btn.liked {
+            background: #ff00ff;
+            color: #0a0e27;
+        }
+        
+        .lightbox {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        .lightbox.active {
+            display: flex;
+        }
+        
+        .lightbox-content {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+        }
+        
+        .lightbox img {
+            max-width: 100%;
+            max-height: 100%;
+            border: 2px solid #ff00ff;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.8);
+        }
+        
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 40px;
+            color: #ff00ff;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.8);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #ff00ff;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .lightbox-close:hover {
+            background: #ff00ff;
+            color: #0a0e27;
+        }
+        
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            pointer-events: none;
+        }
+        
+        .lightbox-btn {
+            pointer-events: all;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00f0ff;
+            border: 2px solid #00f0ff;
+            font-size: 30px;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .lightbox-btn:hover {
+            background: #00f0ff;
+            color: #0a0e27;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>CEDE ARENA</h1>
+            <p>CINEMATIC VISUAL DIRECTION</p>
+        </div>
+        
+        <div class="disclaimer">
+            <strong>Disclaimer:</strong> Ces images sont des références visuelles et des points de départ créatifs pour la direction artistique du projet. 
+            Elles montrent l'atmosphère, les styles cinématiques, et les compositions envisagées pour la vidéo finale.
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="arena">Arena</button>
+            <button class="tab-btn" data-tab="foule">Foule</button>
+            <button class="tab-btn" data-tab="personnages">Toly VS Vlad</button>
+            <button class="tab-btn" data-tab="combat">Combat</button>
+        </div>
+
+        <!-- ARENA -->
+        <div class="gallery" id="tab-arena" style="display: grid;">
+            <div class="gallery-item" data-tab="arena" data-index="0"><img src="./colisee.png" alt=""><button class="like-btn" data-image="arena-0">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="1"><img src="./cyberpunk.png" alt=""><button class="like-btn" data-image="arena-1">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="2"><img src="./downtown.png" alt=""><button class="like-btn" data-image="arena-2">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="3"><img src="./esport.png" alt=""><button class="like-btn" data-image="arena-3">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="4"><img src="./hf_20260910_215229_6707d5d0-521d-47a2-a922-852896724c3b_min.webp" alt=""><button class="like-btn" data-image="arena-4">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="5"><img src="./hf_20260910_215930_f6bc8e00-c054-41df-b5ae-64d1fb7fc64c_min.webp" alt=""><button class="like-btn" data-image="arena-5">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="6"><img src="./madmax.png" alt=""><button class="like-btn" data-image="arena-6">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="7"><img src="./neon.png" alt=""><button class="like-btn" data-image="arena-7">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="8"><img src="./nocturne.png" alt=""><button class="like-btn" data-image="arena-8">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="9"><img src="./reelsteel.png" alt=""><button class="like-btn" data-image="arena-9">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="10"><img src="./regular.png" alt=""><button class="like-btn" data-image="arena-10">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="11"><img src="./tron.png" alt=""><button class="like-btn" data-image="arena-11">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="12"><img src="./ufc.png" alt=""><button class="like-btn" data-image="arena-12">🤍</button></div>
+            <div class="gallery-item" data-tab="arena" data-index="13"><img src="./vs.webp" alt=""><button class="like-btn" data-image="arena-13">🤍</button></div>
+        </div>
+
+        <!-- FOULE -->
+        <div class="gallery" id="tab-foule" style="display: none;">
+            <div class="gallery-item" data-tab="foule" data-index="0"><img src="./composite (1).png" alt=""><button class="like-btn" data-image="foule-0">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="1"><img src="./composite.png" alt=""><button class="like-btn" data-image="foule-1">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="2"><img src="./hf_20260910_145540_080fd567-e2ce-473d-9341-5f01b0f9ec72.png" alt=""><button class="like-btn" data-image="foule-2">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="3"><img src="./hf_20260910_211517_2b6f8203-0670-4a6b-8492-8b46d49b812a.png" alt=""><button class="like-btn" data-image="foule-3">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="4"><img src="./hf_20260910_211526_5ab071c0-81d8-4302-be11-4f2ff1046a17.png" alt=""><button class="like-btn" data-image="foule-4">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="5"><img src="./hf_20260910_211553_2a7dba2a-9bc1-444f-b6e7-ef90e7520302.png" alt=""><button class="like-btn" data-image="foule-5">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="6"><img src="./hf_20260910_211621_573ae520-ff73-4b6f-bc9f-648ca194c4b4.png" alt=""><button class="like-btn" data-image="foule-6">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="7"><img src="./hf_20260910_212117_adec6d68-cf3c-48e6-b9ad-b5d3538fdefa.png" alt=""><button class="like-btn" data-image="foule-7">🤍</button></div>
+            <div class="gallery-item" data-tab="foule" data-index="8"><img src="./hf_20260910_212314_ecb1dd97-49ea-4f2a-a3bd-44c3d9d16d01.png" alt=""><button class="like-btn" data-image="foule-8">🤍</button></div>
+        </div>
+
+        <!-- TOLY VS VLAD -->
+        <div class="gallery" id="tab-personnages" style="display: none;">
+            <div class="gallery-item" data-tab="personnages" data-index="0"><img src="./color-graded (1).png" alt=""><button class="like-btn" data-image="personnages-0">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="1"><img src="./hf_20260910_213715_11e2c1c4-bb2f-4e24-92e7-57b196dbe05e_min.webp" alt=""><button class="like-btn" data-image="personnages-1">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="2"><img src="./hf_20260910_213715_adf78494-675f-4623-a22b-dd334e000a13_min.webp" alt=""><button class="like-btn" data-image="personnages-2">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="3"><img src="./hf_20260910_213715_c821ffbc-7aba-4091-9c7b-40334a232ee1_min.webp" alt=""><button class="like-btn" data-image="personnages-3">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="4"><img src="./hf_20260910_213715_eca17202-9525-4bcb-916f-dea10a6c54bf_min.webp" alt=""><button class="like-btn" data-image="personnages-4">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="5"><img src="./hf_20260910_213715_ee56fbf3-d92d-4ed1-a7d7-d89b20ea0846_min.webp" alt=""><button class="like-btn" data-image="personnages-5">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="6"><img src="./hf_20260910_214339_3346b9df-33ae-4c9b-93c1-62f62eeaec0a.png" alt=""><button class="like-btn" data-image="personnages-6">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="7"><img src="./hf_20260910_214355_3e9513cf-c628-4764-8521-ea7aa05d5a1a.png" alt=""><button class="like-btn" data-image="personnages-7">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="8"><img src="./hf_20260910_214842_781a9e07-2eb6-45e4-949d-55f3972fbbc4.png" alt=""><button class="like-btn" data-image="personnages-8">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="9"><img src="./hf_20260910_215621_6857a8bd-532c-4798-b379-0b30335ce913.png" alt=""><button class="like-btn" data-image="personnages-9">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="10"><img src="./hf_20260910_215712_6e982b81-fdb9-457b-9446-bca19479dddd.png" alt=""><button class="like-btn" data-image="personnages-10">🤍</button></div>
+            <div class="gallery-item" data-tab="personnages" data-index="11"><img src="./hf_20260910_215930_372a95c4-b082-4c1c-9a0f-7eb7bb913db6_min.webp" alt=""><button class="like-btn" data-image="personnages-11">🤍</button></div>
+        </div>
+
+        <!-- COMBAT -->
+        <div class="gallery" id="tab-combat" style="display: none;">
+            <div class="gallery-item" data-tab="combat" data-index="0"><img src="./hf_20260910_145620_cc1f46b4-2a4a-4725-b88d-c971acf1ed9e.png" alt=""><button class="like-btn" data-image="combat-0">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="1"><img src="./hf_20260910_145640_a8fd36fc-41c0-4a61-a5df-420132f61145.png" alt=""><button class="like-btn" data-image="combat-1">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="2"><img src="./hf_20260910_145651_8932c898-5763-497f-afb7-d150a044d8d5.png" alt=""><button class="like-btn" data-image="combat-2">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="3"><img src="./hf_20260910_221252_7ca06b4c-0d99-416e-9ab5-6bce7b24ab6c_min.webp" alt=""><button class="like-btn" data-image="combat-3">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="4"><img src="./hf_20260910_221253_f718ffb1-aa2e-4c60-87b3-74eebe1855b5_min.webp" alt=""><button class="like-btn" data-image="combat-4">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="5"><img src="./hf_20260910_221311_2a421d94-983a-46a0-aca3-9dd81d917472_min.webp" alt=""><button class="like-btn" data-image="combat-5">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="6"><img src="./hf_20260910_221312_60dce991-127e-4e89-813b-3bc5fcafcc68_min.webp" alt=""><button class="like-btn" data-image="combat-6">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="7"><img src="./hf_20260910_221647_1c45d72c-a0a5-438f-a0cb-1c27d616e586_min.webp" alt=""><button class="like-btn" data-image="combat-7">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="8"><img src="./hf_20260910_221647_c02e2b32-339d-4643-b1df-b73353471c72_min.webp" alt=""><button class="like-btn" data-image="combat-8">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="9"><img src="./hf_20260910_221704_9a012220-6800-4d86-bf38-0bb18e5c6956_min.webp" alt=""><button class="like-btn" data-image="combat-9">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="10"><img src="./hf_20260910_221704_59664f91-2c40-48cf-a5ae-cafd683b75fb_min.webp" alt=""><button class="like-btn" data-image="combat-10">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="11"><img src="./hf_20260910_221716_39cadebf-e4d3-4ac9-9242-16e03f4a0815_min.webp" alt=""><button class="like-btn" data-image="combat-11">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="12"><img src="./hf_20260910_221740_1ac300c4-249e-4846-92f6-995de974f014_min.webp" alt=""><button class="like-btn" data-image="combat-12">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="13"><img src="./hf_20260910_221740_7840b8d6-6995-44ed-b181-071720e7a669_min.webp" alt=""><button class="like-btn" data-image="combat-13">🤍</button></div>
+            <div class="gallery-item" data-tab="combat" data-index="14"><img src="./hf_20260910_221740_d80a0f9a-92c3-482b-b494-29619caaa593_min.webp" alt=""><button class="like-btn" data-image="combat-14">🤍</button></div>
+        </div>
+
+        <div class="lightbox" id="lightbox">
+            <div class="lightbox-content">
+                <img id="lightbox-img" src="" alt="">
+                <div class="lightbox-nav">
+                    <button class="lightbox-btn" id="prev-btn">❮</button>
+                    <button class="lightbox-btn" id="next-btn">❯</button>
+                </div>
+                <div class="lightbox-close" id="close-lightbox">&times;</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tab = btn.dataset.tab;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.gallery').forEach(g => g.style.display = 'none');
+                document.getElementById('tab-' + tab).style.display = 'grid';
+            });
+        });
+        
+        let currentTab = 'arena';
+        let currentIndex = 0;
+        let currentTabImages = [];
+        
+        function openLightbox(tabId, index) {
+            currentTab = tabId;
+            currentIndex = index;
+            currentTabImages = Array.from(document.querySelectorAll(`[data-tab="${tabId}"]`));
+            const img = currentTabImages[index].querySelector('img');
+            document.getElementById('lightbox-img').src = img.src;
+            document.getElementById('lightbox').classList.add('active');
+        }
+        
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+        }
+        
+        function showPrev() {
+            currentIndex = (currentIndex - 1 + currentTabImages.length) % currentTabImages.length;
+            const img = currentTabImages[currentIndex].querySelector('img');
+            document.getElementById('lightbox-img').src = img.src;
+        }
+        
+        function showNext() {
+            currentIndex = (currentIndex + 1) % currentTabImages.length;
+            const img = currentTabImages[currentIndex].querySelector('img');
+            document.getElementById('lightbox-img').src = img.src;
+        }
+        
+        document.querySelectorAll('.gallery-item').forEach((item) => {
+            item.addEventListener('click', (e) => {
+                if (!e.target.classList.contains('like-btn')) {
+                    const tab = item.dataset.tab;
+                    openLightbox(tab, parseInt(item.dataset.index));
+                }
+            });
+        });
+        
+        document.getElementById('close-lightbox').addEventListener('click', closeLightbox);
+        document.getElementById('prev-btn').addEventListener('click', showPrev);
+        document.getElementById('next-btn').addEventListener('click', showNext);
+        
+        document.addEventListener('keydown', (e) => {
+            if (document.getElementById('lightbox').classList.contains('active')) {
+                if (e.key === 'ArrowLeft') showPrev();
+                if (e.key === 'ArrowRight') showNext();
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+        
+        const likeStorage = JSON.parse(localStorage.getItem('cedeArenaLikes')) || {};
+        
+        document.querySelectorAll('.like-btn').forEach(btn => {
+            const imageId = btn.dataset.image;
+            if (likeStorage[imageId]) {
+                btn.textContent = '❤️';
+                btn.classList.add('liked');
+            }
+            
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                btn.classList.toggle('liked');
+                btn.textContent = btn.classList.contains('liked') ? '❤️' : '🤍';
+                
+                if (btn.classList.contains('liked')) {
+                    likeStorage[imageId] = true;
+                } else {
+                    delete likeStorage[imageId];
+                }
+                
+                localStorage.setItem('cedeArenaLikes', JSON.stringify(likeStorage));
+            });
+        });
+    </script>
+</body>
+</html>
